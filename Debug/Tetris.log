@@ -1,0 +1,10 @@
+﻿  Rule.cpp
+  main.cpp
+e:\gitworkspace\tetris\tetris\main.cpp(8): warning C4005: “ERROR”: 宏重定义
+  c:\program files (x86)\windows kits\8.1\include\um\wingdi.h(114): note: 参见“ERROR”的前一个定义
+  Drawer.cpp
+  Cell.cpp
+  Board.cpp
+  正在生成代码...
+  Tetris.vcxproj -> E:\GitWorkSpace\Tetris\Tetris\Debug\Tetris.exe
+  Tetris.vcxproj -> E:\GitWorkSpace\Tetris\Tetris\Debug\Tetris.pdb (Full PDB)

@@ -8,14 +8,6 @@ Cell::Cell()
 	: m_block_color(DEFAULT_COLOR)
 	, m_isfull(false)
 {
-	static int i = 0;
-	++i;
-	std::cout << this->m_block_color;
-	if (i % 10 == 0)
-	{
-		std::cout << std::endl;
-	}
-
 }
 
 

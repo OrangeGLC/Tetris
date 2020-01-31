@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Board.h"
 
 #define CELL_SIZE			(40)
@@ -13,9 +12,9 @@
 class Drawer
 {
 public:
-	Drawer(int width = 5, COLORREF border_color = DEFT_BORDER_COLOR, COLORREF line_color = LINE_COLOR);
+	Drawer(Board &bd, int width = 5, COLORREF border_color = DEFT_BORDER_COLOR, COLORREF line_color = LINE_COLOR);
 	~Drawer();
-	void drawGame(Board board);
+	void drawGame(Board& board);
 	void setBorderColor(COLORREF border_color);
 	void setLineColor(COLORREF line_color);
 

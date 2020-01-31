@@ -2,20 +2,17 @@
 #include <time.h>
 #include <iostream>
 
-DIRECTION Rule::m_statu_I = LEFT;
-DIRECTION Rule::m_statu_O = UP;
-DIRECTION Rule::m_statu_J = UP;
-DIRECTION Rule::m_statu_L = UP;
-DIRECTION Rule::m_statu_S = UP;
-DIRECTION Rule::m_statu_Z = UP;
-DIRECTION Rule::m_statu_T = UP;
+#define COLOR_I (RGB(247, 68, 97))
 
-Rule::Rule(Board &bd, Drawer &dw)
-	: m_fall_speed(1000)
+
+Rule::Rule(Board &bd)
+	: m_shape(SHAPE_I)
+	, m_direct(LEFT)
+	, m_cur_position(4,0)
+	, m_fall_speed(500)
 	, m_score(0)
 {
-	generateI(bd, dw);
-	fallI(bd, dw);
+	runGame(bd);
 }
 
 
@@ -24,27 +21,62 @@ Rule::~Rule()
 }
 
 
-void Rule::generateSquire()
+int Rule::generateSquire(Board &bd)
 {
 
+	srand((unsigned)time(0));
+	switch (0/*rand() % 7*/)
+	{
+	case 0:
+		generateI(bd);
+		break;
+	case 1:
+		generateO(bd);
+		break;
+	case 2:
+		generateL(bd);
+		break;
+	case 3:
+		generateJ(bd);
+		break;
+	case 4:
+		generateS(bd);
+		break;
+	case 5:
+		generateZ(bd);
+		break;
+	case 6:
+		generateT(bd);
+		break;
+	default:
+		break;
+	}
+	return 0;
 }
 
 
 // 生成I形状方块
-int Rule::generateI(Board &bd, Drawer &dw, int i , int j)
+void Rule::generateI(Board &bd)
 {
-	m_statu_I = generateDirection();
-	if (m_statu_I == UP || m_statu_I == DOWN)
+	m_direct = generateDirection();
+	m_shape = SHAPE_I;
+	m_cur_position.x(4);
+	m_cur_position.y(0);
+
+	int i = m_cur_position.x();
+	int j = m_cur_position.y();
+
+	if (m_direct == UP || m_direct == DOWN)
 	{
 		bd.setCellStatu(i, j , true);
 		bd.setCellStatu(i, j + 1, true);
 		bd.setCellStatu(i, j + 2, true);
 		bd.setCellStatu(i, j + 3, true);
 						   
-		bd.setCellColor(i, j, RGB(247, 68, 97));
-		bd.setCellColor(i, j + 1, RGB(247, 68, 97));
-		bd.setCellColor(i, j + 2, RGB(247, 68, 97));
-		bd.setCellColor(i, j + 3, RGB(247, 68, 97));
+		bd.setCellColor(i, j, COLOR_I);
+		bd.setCellColor(i, j + 1, COLOR_I);
+		bd.setCellColor(i, j + 2, COLOR_I);
+		bd.setCellColor(i, j + 3, COLOR_I);
 	}
 	else
 	{
@@ -54,76 +86,94 @@ int Rule::generateI(Board &bd, Drawer &dw, int i , int j)
 		bd.setCellStatu(i + 2, j, true);
 		bd.setCellStatu(i + 3, j, true);
 
-		bd.setCellColor(i, j, RGB(247, 68, 97));
-		bd.setCellColor(i + 1, j, RGB(247, 68, 97));
-		bd.setCellColor(i + 2, j, RGB(247, 68, 97));
-		bd.setCellColor(i + 3, j, RGB(247, 68, 97));
+		bd.setCellColor(i, j, COLOR_I);
+		bd.setCellColor(i + 1, j, COLOR_I);
+		bd.setCellColor(i + 2, j, COLOR_I);
+		bd.setCellColor(i + 3, j, COLOR_I);
 	}
-
-	dw.drawGame(bd);
-	return 0;
+	m_cur_position.x(i);
+	return;
 }
 
 
-// I方块下落
-void Rule::fallI(Board &bd, Drawer &dw, int i, int j)
+// I方块下落1格
+void Rule::fallI(Board &bd)
 {
-	if (!(m_statu_I == UP || m_statu_I == DOWN))
+	int i = m_cur_position.x();
+	int j = m_cur_position.y();
+	
+	if (m_direct == UP || m_direct == DOWN)
 	{
-		i--;
+		bd.setCellStatu(i, j, false);
+		bd.setCellStatu(i, j + 1, true);
+		bd.setCellStatu(i, j + 2, true);
+		bd.setCellStatu(i, j + 3, true);
+		bd.setCellStatu(i, j + 4, true);
+		
+		bd.setCellColor(i, j + 1, COLOR_I);
+		bd.setCellColor(i, j + 2, COLOR_I);
+		bd.setCellColor(i, j + 3, COLOR_I);
+		bd.setCellColor(i, j + 4, COLOR_I);
+	}
+	else
+	{
+		bd.setCellStatu(i, j, false);
+		bd.setCellStatu(i + 1, j, false);
+		bd.setCellStatu(i + 2, j, false);
+		bd.setCellStatu(i + 3, j, false);
+
+		bd.setCellStatu(i, j + 1, true);
+		bd.setCellStatu(i + 1, j + 1, true);
+		bd.setCellStatu(i + 2, j + 1, true);
+		bd.setCellStatu(i + 3, j + 1, true);
+
+		bd.setCellColor(i, j + 1, COLOR_I);
+		bd.setCellColor(i + 1, j + 1, COLOR_I);
+		bd.setCellColor(i + 2, j + 1, COLOR_I);
+		bd.setCellColor(i + 3, j + 1, COLOR_I);
 	}
 
-	while (1)
-	{
-		if (m_statu_I == UP || m_statu_I == DOWN)
-		{
-			bd.setCellStatu(i, j, false);
-			bd.setCellStatu(i, j + 1, true);
-			bd.setCellStatu(i, j + 2, true);
-			bd.setCellStatu(i, j + 3, true);
-			bd.setCellStatu(i, j + 4, true);
-			
-			bd.setCellColor(i, j + 1, RGB(247, 68, 97));
-			bd.setCellColor(i, j + 2, RGB(247, 68, 97));
-			bd.setCellColor(i, j + 3, RGB(247, 68, 97));
-			bd.setCellColor(i, j + 4, RGB(247, 68, 97));
-		}
-		else
-		{
-			bd.setCellStatu(i, j, false);
-			bd.setCellStatu(i + 1, j, false);
-			bd.setCellStatu(i + 2, j, false);
-			bd.setCellStatu(i + 3, j, false);
+	m_cur_position.y(++j);	
+}
 
-			bd.setCellStatu(i, j + 1, true);
-			bd.setCellStatu(i + 1, j + 1, true);
-			bd.setCellStatu(i + 2, j + 1, true);
-			bd.setCellStatu(i + 3, j + 1, true);
+void Rule::fallO(Board & bd)
+{
+	return;
+}
 
-			bd.setCellColor(i, j + 1, RGB(247, 68, 97));
-			bd.setCellColor(i + 1, j + 1, RGB(247, 68, 97));
-			bd.setCellColor(i + 2, j + 1, RGB(247, 68, 97));
-			bd.setCellColor(i + 3, j + 1, RGB(247, 68, 97));
-		}
+void Rule::fallJ(Board & bd)
+{
+	return;
+}
 
-		Sleep(m_fall_speed);
-		dw.drawGame(bd);
-		j++;
-		if (isBottomOut(bd, i, j, SHAPE_I))
-		{
-			break;
-		}	
-	}
+void Rule::fallL(Board & bd)
+{
+	return;
+}
+
+void Rule::fallZ(Board & bd)
+{
+	return;
+}
+
+void Rule::fallS(Board & bd)
+{
+	return;
+}
+
+void Rule::fallT(Board & bd)
+{
+	return;
 }
 
 
 // 是否触底
-bool Rule::isBottomOut(Board &bd, int x, int y, SHAPE shape)
+bool Rule::isBottomOut(Board &bd)
 {
-	switch (shape)
+	switch (m_shape)
 	{
 	case SHAPE_I:
-		return isBottomOutShapeI(bd, x, y);
+		return isBottomOutShapeI(bd);
 	case SHAPE_J:
 		break;
 	case SHAPE_L:
@@ -142,11 +192,14 @@ bool Rule::isBottomOut(Board &bd, int x, int y, SHAPE shape)
 
 
 // 判断I方块是否触底
-bool Rule::isBottomOutShapeI(Board& bd, int i, int j)
+bool Rule::isBottomOutShapeI(Board& bd)
 {
-	if (m_statu_I == UP || m_statu_I == DOWN)
+	int i = m_cur_position.x();
+	int j = m_cur_position.y();
+
+	if (m_direct == UP || m_direct == DOWN)
 	{
-		if (j + 4 >= bd.getBoardHight() || true == bd.getCellStatus(i,j + 5))
+		if (j + 4 >= bd.getBoardHight() || true == bd.getCellStatus(i,j + 4))
 		{
 			return true;
 		}
@@ -202,12 +255,154 @@ DIRECTION Rule::generateDirection()
 
 
 // 旋转I方块
-void Rule::whirlI(Board& bd, int x, int y)
+void Rule::whirlI(Board& bd)
 {
-	if (m_statu_I == UP || m_statu_I == DOWN)
+	int x = m_cur_position.x();
+	int y = m_cur_position.y();
+	if (m_direct == UP || m_direct == DOWN)
 	{
-		m_statu_I = LEFT;
+		m_direct = LEFT;
 		bd.setCellStatu(x, y, false);
+		bd.setCellStatu(x, y + 1, false);
+		bd.setCellStatu(x, y + 2, false);
+		bd.setCellStatu(x, y + 3, false);
+
+
+		bd.setCellStatu(x - 1, y + 1, true);
+		bd.setCellStatu(x + 1, y + 1, true);
+		bd.setCellStatu(x + 2, y + 1, true);
+
+		bd.setCellColor(x - 1, y + 1, COLOR_I);
+		bd.setCellColor(x + 1, y + 1, COLOR_I);
+		bd.setCellColor(x + 2, y + 1, COLOR_I);
+	}
+	else
+	{
+		m_direct = UP;
+		bd.setCellStatu(x, y, false);
+		bd.setCellStatu(x + 2, y, false);
+		bd.setCellStatu(x + 3, y, false);
+
+		bd.setCellStatu(x + 1, y - 1, true);
+		bd.setCellStatu(x + 1, y + 1, true);
+		bd.setCellStatu(x + 1, y + 2, true);
+
+		bd.setCellColor(x + 1, y - 1, COLOR_I);
+		bd.setCellColor(x + 1, y + 1, COLOR_I);
+		bd.setCellColor(x + 1, y + 2, COLOR_I);
 	}
 	return;
+}
+
+
+void Rule::runGame(Board &bd)
+{
+	while (true)
+	{
+		generateSquire(bd);
+		if (isBottomOut(bd))
+		{
+			break;
+		}
+		while (true)
+		{
+			Sleep(m_fall_speed);
+			fallSquire(bd);
+			if (isBottomOut(bd))
+			{
+				break;
+			}
+		}
+		
+	}
+	
+}
+
+
+bool Rule::isGameOver(Board& bd)
+{
+	bool ret = false;
+	for (int i = 0; i < bd.getBoardHight(); ++i)
+	{
+		if (bd.getCellStatus(4, i))
+		{
+			//
+		}
+	}
+	return ret;
+}
+
+
+// 生成O形状方块
+void Rule::generateO(Board& bd)
+{
+	return;
+}
+
+
+void Rule::generateL(Board& bd)
+{
+	return;
+}
+
+
+void Rule::generateJ(Board& bd)
+{
+	return;
+}
+
+
+void Rule::generateZ(Board& bd)
+{
+	return;
+}
+
+
+void Rule::generateS(Board& bd)
+{
+	return;
+}
+
+void Rule::generateT(Board& bd)
+{
+	return;
+}
+
+
+int Rule::fallSquire(Board& bd)
+{
+	srand((unsigned)time(0));
+	switch (0/*rand() % 7*/)
+	{
+	case 0:
+		fallI(bd);
+		break;
+	case 1:
+		fallO(bd);
+		break;
+	case 2:
+		fallL(bd);
+		break;
+	case 3:
+		fallJ(bd);
+		break;
+	case 4:
+		fallS(bd);
+		break;
+	case 5:
+		fallZ(bd);
+		break;
+	case 6:
+		fallT(bd);
+		break;
+	default:
+		break;
+	}
+	return 0;
+}
+
+
+// 旋转方块
+void Rule::whirlSquire(Board& bd)
+{
 }

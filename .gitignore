@@ -32,3 +32,7 @@
 *.app
 /Tetris.VC.VC.opendb
 /.vs/Tetris/v14/.suo
+/x64/Debug/Tetris.tlog
+/x64/Debug/Tetris.ilk
+/x64/Debug
+/Tetris.vcxproj.user

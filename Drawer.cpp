@@ -1,15 +1,17 @@
 #include "Drawer.h"
 
 
-
-Drawer::Drawer(int width /*= 5*/, COLORREF border_color /*= DEFT_BORDER_COLOR*/, COLORREF line_color /*= LINE_COLOR*/)
+Drawer::Drawer(Board &bd, int width /*= 5*/, COLORREF border_color /*= DEFT_BORDER_COLOR*/, COLORREF line_color /*= LINE_COLOR*/)
 	: m_border_width(5)
 	, m_border_color(DEFT_BORDER_COLOR)
 	, m_line_color(LINE_COLOR)
+	
 {
 	m_border_width = width;
 	m_border_color = border_color;
 	m_line_color = line_color;
+	border_color = m_border_color;
+
 	initgraph(WIDTH * CELL_SIZE + 2 * m_border_width + FUNAREA_WIDTH, HIGHT * CELL_SIZE + 2 * m_border_width + 3);
 	setlinecolor(m_border_color);
 	setlinestyle(PS_SOLID, m_border_width);
@@ -21,10 +23,11 @@ Drawer::Drawer(int width /*= 5*/, COLORREF border_color /*= DEFT_BORDER_COLOR*/,
 
 Drawer::~Drawer()
 {
+	closegraph();
 }
 
 
-void Drawer::drawGame(Board board)
+void Drawer::drawGame(Board& board)
 {
 	BeginBatchDraw();
 	for (int i = 0; i < board.getBoardWidth(); ++i)
@@ -47,8 +50,8 @@ void Drawer::drawGame(Board board)
 
 				setlinecolor(BACKGROUND_COLOR);
 				setfillcolor(BACKGROUND_COLOR);
-				setlinestyle(PS_SOLID| PS_ENDCAP_SQUARE, LINE_WIDTH);
-				
+				setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, LINE_WIDTH);
+
 				///边角处理
 				//左一格||左下角不为空
 				if ((i != 0) && (board.getCellStatus(i - 1, j) || board.getCellStatus(i - 1, j + 1)))
@@ -71,6 +74,7 @@ void Drawer::drawGame(Board board)
 		}
 	}
 	EndBatchDraw();
+	return;
 }
 
 void Drawer::setBorderColor(COLORREF border_color)
@@ -85,3 +89,4 @@ void Drawer::setLineColor(COLORREF line_color)
 	m_line_color = line_color;
 	return;
 }
+

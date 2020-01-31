@@ -2,6 +2,7 @@
 
 #include "Board.h"
 #include "Drawer.h"
+#include "Coordinate.h"
 
 typedef enum _DIRECTION
 {
@@ -25,33 +26,50 @@ typedef enum _SHAPE
 class Rule
 {
 public:
-	Rule(Board &bd, Drawer &dw);
+	Rule(Board &bd);
 	~Rule();
-	void generateSquire();
 
-	// 生成I形状方块
-	int generateI(Board &bd, Drawer &dw, int i = 4, int j = 0);
-	// I方块下落
-	void fallI(Board &bd, Drawer &dw, int i = 4, int j = 0);
+	// 生成不同形状形状方块
+	int generateSquire(Board &bd);
+	void generateI(Board &bd);
+	void generateO(Board &bd);
+	void generateL(Board &bd);
+	void generateJ(Board &bd);
+	void generateS(Board &bd);
+	void generateZ(Board &bd);
+	void generateT(Board &bd);
+	// 是否触底
+	bool isBottomOut(Board &bd);
+	// 判断I方块是否触底
+	bool isBottomOutShapeI(Board& bd);
+	// 随机生成方向
+	DIRECTION generateDirection();
+	// 旋转方块
+	void whirlSquire(Board& bd);
+	void whirlI(Board& bd);
+
+	void runGame(Board &bd);
+	bool isGameOver(Board& bd);
+
+	//方块下落
+	int fallSquire(Board &bd);
+	void fallI(Board &bd);
+	void fallO(Board &bd);
+	void fallJ(Board &bd);
+	void fallL(Board &bd);
+	void fallZ(Board &bd);
+	void fallS(Board &bd);
+	void fallT(Board &bd);
+
 private:
 	int m_fall_speed;
 	int m_score;
-	static DIRECTION m_statu_I;
-	static DIRECTION m_statu_O;
-	static DIRECTION m_statu_J;
-	static DIRECTION m_statu_L;
-	static DIRECTION m_statu_S;
-	static DIRECTION m_statu_Z;
-	static DIRECTION m_statu_T;
+	DIRECTION m_direct;
+	SHAPE m_shape;
+	Coordinate m_cur_position;
 public:
-	// 是否触底
-	bool isBottomOut(Board &bd, int x, int y, SHAPE shape);
-	// 判断I方块是否触底
-	bool isBottomOutShapeI(Board& bd, int i, int j);
-	// 随机生成方向
-	DIRECTION generateDirection();
-	// 旋转I方块
-	void whirlI(Board& bd, int x, int y);
+	
+	
 };
 
 

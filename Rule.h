@@ -30,7 +30,7 @@ public:
 	~Rule();
 
 	// 生成不同形状形状方块
-	int generateSquire(Board &bd);
+	void generateSquire(Board &bd);
 	void generateI(Board &bd);
 	void generateO(Board &bd);
 	void generateL(Board &bd);
@@ -38,12 +38,13 @@ public:
 	void generateS(Board &bd);
 	void generateZ(Board &bd);
 	void generateT(Board &bd);
+
 	// 是否触底
 	bool isBottomOut(Board &bd);
-	// 判断I方块是否触底
 	bool isBottomOutShapeI(Board& bd);
 	// 随机生成方向
 	DIRECTION generateDirection();
+
 	// 旋转方块
 	void whirlSquire(Board& bd);
 	void whirlI(Board& bd);
@@ -52,7 +53,7 @@ public:
 	bool isGameOver(Board& bd);
 
 	//方块下落
-	int fallSquire(Board &bd);
+	void fallSquire(Board &bd);
 	void fallI(Board &bd);
 	void fallO(Board &bd);
 	void fallJ(Board &bd);
@@ -66,10 +67,16 @@ private:
 	int m_score;
 	DIRECTION m_direct;
 	SHAPE m_shape;
-	Coordinate m_cur_position;
+	Coordinate m_cur_position;		
 public:
-	
-	
+	void moveLeft(Board& bd);
+	void moveLeftI(Board& bd);
+	void moveLeftL(Board& bd);
+	void moveLeftJ(Board& bd);
+	void moveLeftS(Board& bd);
+	void moveLeftZ(Board& bd);
+	void moveLeftT(Board& bd);
+	void moveLeftO(Board& bd);
 };
 
 

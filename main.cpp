@@ -2,6 +2,7 @@
 #include <conio.h>
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include "Drawer.h"
 #include "Rule.h"
 
@@ -10,6 +11,7 @@
 #define ERROR	-1
 
 static Board bd;
+std::mutex g_mutex;
 
 void startDrwa()
 {

@@ -1,9 +1,12 @@
 #include "Rule.h"
 #include <time.h>
 #include <iostream>
+#include <conio.h>
+#include <mutex>
 
 #define COLOR_I (RGB(247, 68, 97))
 
+extern std::mutex g_mutex;
 
 Rule::Rule(Board &bd)
 	: m_shape(SHAPE_I)
@@ -21,9 +24,8 @@ Rule::~Rule()
 }
 
 
-int Rule::generateSquire(Board &bd)
+void Rule::generateSquire(Board &bd)
 {
-
 	srand((unsigned)time(0));
 	switch (0/*rand() % 7*/)
 	{
@@ -51,13 +53,14 @@ int Rule::generateSquire(Board &bd)
 	default:
 		break;
 	}
-	return 0;
+	return;
 }
 
 
 // 生成I形状方块
 void Rule::generateI(Board &bd)
 {
+	g_mutex.lock();
 	m_direct = generateDirection();
 	m_shape = SHAPE_I;
 	m_cur_position.x(4);
@@ -92,6 +95,8 @@ void Rule::generateI(Board &bd)
 		bd.setCellColor(i + 3, j, COLOR_I);
 	}
 	m_cur_position.x(i);
+
+	g_mutex.unlock();
 	return;
 }
 
@@ -99,6 +104,7 @@ void Rule::generateI(Board &bd)
 // I方块下落1格
 void Rule::fallI(Board &bd)
 {
+	g_mutex.lock();
 	int i = m_cur_position.x();
 	int j = m_cur_position.y();
 	
@@ -134,6 +140,7 @@ void Rule::fallI(Board &bd)
 	}
 
 	m_cur_position.y(++j);	
+	g_mutex.unlock();
 }
 
 void Rule::fallO(Board & bd)
@@ -194,6 +201,8 @@ bool Rule::isBottomOut(Board &bd)
 // 判断I方块是否触底
 bool Rule::isBottomOutShapeI(Board& bd)
 {
+	g_mutex.lock();
+	bool ret = false;
 	int i = m_cur_position.x();
 	int j = m_cur_position.y();
 
@@ -201,11 +210,7 @@ bool Rule::isBottomOutShapeI(Board& bd)
 	{
 		if (j + 4 >= bd.getBoardHight() || true == bd.getCellStatus(i,j + 4))
 		{
-			return true;
-		}
-		else
-		{
-			return false;
+			ret = true;
 		}
 	}
 	else
@@ -214,19 +219,17 @@ bool Rule::isBottomOutShapeI(Board& bd)
 		{
 			if (true == bd.getCellStatus(t, j + 1))
 			{
-				return true;
+				ret = true;
+				break;
 			}
 		}
 		if (j + 1 >= bd.getBoardHight())
 		{
-			return true;
-		}
-		else
-		{
-			return false;
+			ret = true;
 		}
 	}
-	return 0;
+	g_mutex.unlock();
+	return ret;
 }
 
 
@@ -257,16 +260,16 @@ DIRECTION Rule::generateDirection()
 // 旋转I方块
 void Rule::whirlI(Board& bd)
 {
+	g_mutex.lock();
 	int x = m_cur_position.x();
 	int y = m_cur_position.y();
+
 	if (m_direct == UP || m_direct == DOWN)
 	{
 		m_direct = LEFT;
 		bd.setCellStatu(x, y, false);
-		bd.setCellStatu(x, y + 1, false);
 		bd.setCellStatu(x, y + 2, false);
 		bd.setCellStatu(x, y + 3, false);
-
 
 		bd.setCellStatu(x - 1, y + 1, true);
 		bd.setCellStatu(x + 1, y + 1, true);
@@ -275,6 +278,9 @@ void Rule::whirlI(Board& bd)
 		bd.setCellColor(x - 1, y + 1, COLOR_I);
 		bd.setCellColor(x + 1, y + 1, COLOR_I);
 		bd.setCellColor(x + 2, y + 1, COLOR_I);
+
+		m_cur_position.x(x - 1);
+		m_cur_position.y(y + 1);
 	}
 	else
 	{
@@ -290,28 +296,51 @@ void Rule::whirlI(Board& bd)
 		bd.setCellColor(x + 1, y - 1, COLOR_I);
 		bd.setCellColor(x + 1, y + 1, COLOR_I);
 		bd.setCellColor(x + 1, y + 2, COLOR_I);
+
+		m_cur_position.x(x + 1);
+		m_cur_position.y(y - 1);
 	}
+	g_mutex.unlock();
 	return;
 }
 
 
 void Rule::runGame(Board &bd)
 {
+	char ch;
 	while (true)
 	{
 		generateSquire(bd);
-		if (isBottomOut(bd))
+		if (isGameOver(bd))
 		{
 			break;
 		}
 		while (true)
 		{
-			Sleep(m_fall_speed);
-			fallSquire(bd);
+			if (_kbhit())
+			{
+				ch = getch();
+				switch (ch)
+				{
+				case 0x48://上
+					whirlI(bd);
+					break;
+				case 0x50://下
+					break;
+				case 0x4b://左
+					break;
+				case 0x4d://右
+					break;
+				}
+			}
+			
 			if (isBottomOut(bd))
 			{
 				break;
 			}
+			Sleep(m_fall_speed);
+			fallSquire(bd);
+			
 		}
 		
 	}
@@ -369,40 +398,109 @@ void Rule::generateT(Board& bd)
 }
 
 
-int Rule::fallSquire(Board& bd)
+void Rule::fallSquire(Board& bd)
 {
-	srand((unsigned)time(0));
-	switch (0/*rand() % 7*/)
+	switch (m_shape)
 	{
-	case 0:
+	case SHAPE_I:
 		fallI(bd);
 		break;
-	case 1:
+	case SHAPE_O:
 		fallO(bd);
 		break;
-	case 2:
+	case SHAPE_L:
 		fallL(bd);
 		break;
-	case 3:
+	case SHAPE_J:
 		fallJ(bd);
 		break;
-	case 4:
+	case SHAPE_S:
 		fallS(bd);
 		break;
-	case 5:
+	case SHAPE_Z:
 		fallZ(bd);
 		break;
-	case 6:
+	case SHAPE_T:
 		fallT(bd);
 		break;
 	default:
 		break;
 	}
-	return 0;
+	return;
 }
 
 
 // 旋转方块
 void Rule::whirlSquire(Board& bd)
+{
+}
+
+
+void Rule::moveLeft(Board& bd)
+{
+	switch (m_shape)
+	{
+	case SHAPE_I:
+		moveLeftI(bd);
+		break;
+	case SHAPE_L:
+		moveLeftL(bd);
+		break;
+	case SHAPE_J:
+		moveLeftJ(bd);
+		break;
+	case SHAPE_S:
+		moveLeftS(bd);
+		break;
+	case SHAPE_Z:
+		moveLeftZ(bd);
+		break;
+	case SHAPE_T:
+		moveLeftT(bd);
+		break;
+	case SHAPE_O:
+		moveLeftO(bd);
+		break;
+	default:
+		break;
+
+	}
+}
+
+
+void Rule::moveLeftI(Board& bd)
+{
+	int i = m_cur_position.x();
+	int j = m_cur_position.y();
+
+}
+
+
+void Rule::moveLeftJ(Board& bd)
+{
+}
+
+
+void Rule::moveLeftL(Board& bd)
+{
+}
+
+
+void Rule::moveLeftS(Board& bd)
+{
+}
+
+
+void Rule::moveLeftZ(Board& bd)
+{
+}
+
+
+void Rule::moveLeftT(Board& bd)
+{
+}
+
+
+void Rule::moveLeftO(Board& bd)
 {
 }

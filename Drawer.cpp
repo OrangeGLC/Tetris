@@ -13,10 +13,6 @@ Drawer::Drawer(Board &bd, int width /*= 5*/, COLORREF border_color /*= DEFT_BORD
 	border_color = m_border_color;
 
 	initgraph(WIDTH * CELL_SIZE + 2 * m_border_width + FUNAREA_WIDTH, HIGHT * CELL_SIZE + 2 * m_border_width + 3);
-	setlinecolor(m_border_color);
-	setlinestyle(PS_SOLID, m_border_width);
-	setfillcolor(BACKGROUND_COLOR);
-	fillrectangle(2,2, WIDTH * CELL_SIZE + 2 * m_border_width, HIGHT * CELL_SIZE + 2 * m_border_width);
 }
 
 
@@ -29,7 +25,14 @@ Drawer::~Drawer()
 
 void Drawer::drawGame(Board& board)
 {
+	g_mutex.lock();
 	BeginBatchDraw();
+
+	setlinecolor(m_border_color);
+	setlinestyle(PS_SOLID, m_border_width);
+	setfillcolor(BACKGROUND_COLOR);
+	fillrectangle(2, 2, WIDTH * CELL_SIZE + 2 * m_border_width, HIGHT * CELL_SIZE + 2 * m_border_width);
+
 	for (int i = 0; i < board.getBoardWidth(); ++i)
 	{
 		for (int j = 0; j < board.getBoardHight(); ++j)
@@ -74,6 +77,7 @@ void Drawer::drawGame(Board& board)
 		}
 	}
 	EndBatchDraw();
+	g_mutex.unlock();
 	return;
 }
 

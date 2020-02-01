@@ -1,5 +1,6 @@
 #pragma once
 #include "Board.h"
+#include <mutex>
 
 #define CELL_SIZE			(40)
 #define FUNAREA_WIDTH		(150)
@@ -8,6 +9,7 @@
 #define LINE_WIDTH			(3)
 #define DEFT_BORDER_COLOR	(RGB(179,197,135))
 
+extern std::mutex g_mutex;
 
 class Drawer
 {
